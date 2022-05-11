@@ -12,7 +12,6 @@ function solution(genres, plays) {
     }
     const sortGenre = Object.entries(genresObject).sort(([, a], [, b]) =>  b["sum"] - a["sum"])
     for(let i in sortGenre){
-        console.log(sortGenre[i][1])
         const sortPlay = Object.entries(sortGenre[i][1])
         .sort(([, a], [, b]) => b - a)
         if(sortPlay[1][0] !== 'sum'){
