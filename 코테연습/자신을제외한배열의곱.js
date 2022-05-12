@@ -1,15 +1,15 @@
-function solution(arr){
+function solution(arr){ //왼족 먼저 곱하고 이후 오른쪽
     let prev = 1
-    let answer = []
-    for(let i = 0; i< arr.length-1;i++){
-        let sumValue = prev
-        for(let j =i+1;j<arr.length;j++){
-            sumValue *= arr[j]
-        }
-        answer.push(sumValue)
-        prev *= arr[i]
+    let answer = [prev]
+    for(let i =1;i<arr.length;i++){
+        prev *= arr[i-1]
+        answer.push(prev)
     }
-    answer.push(prev)
+    prev = 1
+    for(let i = arr.length -2; i>=0;i--){
+        prev *= arr[i+1]
+        answer[i] *= prev
+    }
     return answer
 }
 
