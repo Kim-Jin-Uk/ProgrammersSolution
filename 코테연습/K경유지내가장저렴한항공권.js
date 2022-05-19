@@ -1,6 +1,7 @@
 const findCheapestPrice = (n, flights, src, dst, k) => {
     const routes = getStartToEndRoute(n, flights);
 
+    //비용
     const mapped = Array.from({length:n}, () => Number.MAX_SAFE_INTEGER);
     mapped[src] = 0;
     const queue = [[src, 0, 0]];
@@ -23,11 +24,6 @@ const getStartToEndRoute = (n, flights) => {
       const [start, end, price] = flight;
       arr[start].push([end, price]);
     });
-    for(let i of arr){
-        for(let j of i){
-            console.log(j)
-        }
-    }
     return arr;
 };
 

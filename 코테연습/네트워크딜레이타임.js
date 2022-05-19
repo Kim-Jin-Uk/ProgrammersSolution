@@ -1,35 +1,37 @@
 function solution(times,n,k) {
-    let maxTime = 0;
-    let timeObject = {}
-    for(let i of times){
-        if(i[1] !== k){
-            timeObject[i[0]] = (timeObject[i[0]] || []).concat([[i[1],i[2]]])
+    const map = new Map();
+    const dp=Array(n+1).fill(Number.MAX_VALUE);
+    const visited = Array(n+1).fill(0);
+    
+    dp[0]=0;
+    dp[k]=0;
+    
+    for(let [now,next,time] of times){
+        if(map.has(now)) map.get(now).push([next,time]);
+        else map.set(now,[[next,time]]);
+    }
+    
+    const q=[[k,0]];
+    
+    while(q.length){
+        const [now, time]=q.shift();
+        
+        if(visited[now]) continue;
+        visited[now]=1;
+        
+        if(!map.has(now)) continue;
+        
+        for(let [next,nextTime] of map.get(now)){
+            dp[next]=Math.min(dp[next], dp[now]+nextTime);
+            
+            if(visited[next]) continue;
+            q.push([next,dp[next]]);
         }
+        q.sort((a,b)=>a[1]-b[1]);
     }
-    let timeVisited = {}
-    let visited = []
-    function visit(key,time,path){
-        if(timeObject[key] === undefined){return}
-        for(let i of timeObject[key]){
-            if(!visited.includes(path+`,${i[0]}`) && !path.includes(`,${i[0]}`)){
-                const visitTime = time+i[1]
-                timeVisited[i[0]] = Math.min(visitTime,(timeVisited[i[0]] || visitTime))
-                console.log(i[0],path,visitTime,timeVisited[i[0]])
-                visited.push(path+`,${i[0]}`)
-                visit(i[0],visitTime,path+`,${i[0]}`)
-            }
-        }
-    }
-
-    visit(k,0,`${k}`)
-    let checker = [k]
-    for(let i in timeVisited){
-        checker.push(i)
-        maxTime = Math.max(timeVisited[i],maxTime)
-        console.log(i,timeVisited[i])
-    }
-    if(checker.length !== n){return -1}
-    return maxTime
+    
+    const max = Math.max(...dp);
+    return max===Number.MAX_VALUE ? -1 : max;
 }
 
 console.log('sol',solution([[2,1,1],[2,3,1],[3,4,1],[1,4,0]],4,2))
