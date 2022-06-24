@@ -1,39 +1,35 @@
 function solution(play_time, adv_time, logs) {
     let answer = 0
-    let maxViewCount = -1
-    let maxViewTime
-    play_time = str2int(play_time)
-    adv_time = str2int(adv_time)
-    logs = logs.map((v) => {
-        const [startTime,endTime] = v.split('-')
-        return [str2int(startTime),str2int(endTime)]
-    })
-
-    let divisions = [0]
-    for(const log of logs){
-        divisions.push(log[0])
-        divisions.push(log[1])
+    const playTime = str2int(play_time);
+    const advTime = str2int(adv_time);
+  
+    let playList = new Array(playTime).fill(0);
+  
+    logs.forEach((time) => {
+        let times = time.split("-");
+        const startTime = str2int(times[0]);
+        const endTime = str2int(times[1]);
+    
+        playList[startTime] += 1;
+        playList[endTime] -= 1;
+    });
+  
+    // 해당 시간, 시청자 수
+    for (let i = 1; i < playTime; i++) {
+        playList[i] += playList[i - 1];
     }
 
-    divisions.sort((a,b) => a - b)
-    logs.sort((a,b) => a[0] - b[0])
-    // console.log(divisions);
+    // 해당 시간, 누적 재생 수
+    for (let i = 1; i < playTime; i++) {
+        playList[i] += playList[i - 1];
+    }
 
-    for(const division of divisions){
-        let viewCount = 0
-        let viewTime = 0
-        const ad = [division,division+adv_time]
-        for(const log of logs){
-            if(ad[0] > log[1])continue
-            if(ad[1] < log[0])break
-            viewCount ++
-            viewTime += (Math.min(log[1],ad[1]) - Math.max(log[0],ad[0]))
-        }
-        if(maxViewCount < viewCount || (maxViewCount === viewCount && maxViewTime < viewTime)){
-            maxViewCount = viewCount
-            maxViewTime = viewTime
-            // console.log(viewCount,division);
-            answer = division
+    // 광고 시간만큼 배열을 비교
+    let accumulate = playList[advTime - 1];
+    for (let i = 0; i < playTime; i++) {
+        if (playList[i + advTime] - playList[i] > accumulate) {
+        accumulate = playList[i + advTime] - playList[i];
+        answer = i + 1;
         }
     }
 
@@ -42,11 +38,22 @@ function solution(play_time, adv_time, logs) {
         return +H*3600 + +M*60 + +S
     }
 
-    const H = Math.floor(answer / 3600)
-    const M = Math.floor(answer / 60 - 60*H)
-    const S = answer % 60
-    return `${H > 10 ? '' : '0'}${H}:${M > 10 ? '' : '0'}${M}:${S > 10 ? '' : '0'}${S}`
+    let h = parseInt(answer / 3600);
+    answer %= 3600;
+    let m = parseInt(answer / 60);
+    answer %= 60;
+    let s = parseInt(answer);
+
+    h = h < 10 ? "0" + h : h;
+    m = m < 10 ? "0" + m : m;
+    s = s < 10 ? "0" + s : s;
+
+    return h + ":" + m + ":" + s;
 }
+
+console.log(solution(
+    "00:01:00",	"00:00:30",	["00:00:02-00:00:14", "00:00:00-00:01:00", "00:00:05-00:00:29"]
+))
 
 console.log(solution(
     "02:03:55",	"00:14:15",	["01:20:15-01:45:14", "00:40:31-01:00:00", "00:25:50-00:48:29", "01:30:59-01:53:29", "01:37:44-02:02:30"]
